@@ -1,0 +1,130 @@
+{
+  "metrics": [
+    {
+      "name": "销售额",
+      "aliases": [
+        "GMV",
+        "营收",
+        "销售金额",
+        "营业额"
+      ],
+      "definition": "订单中状态非「已取消」且状态非「退款中」的订单明细金额合计（amount = 单价×数量×(1-折扣)）。",
+      "formula": "SUM(order_items.amount) WHERE orders.status IN ('已完成','已签收')",
+      "caveats": "口径默认剔除已取消/退款中订单；如按地区/渠道拆分需 JOIN stores / orders。"
+    },
+    {
+      "name": "净销售额",
+      "aliases": [
+        "净营收",
+        "扣退销售额"
+      ],
+      "definition": "销售额减去同期退货退款金额（returns.refund_amount）。",
+      "formula": "销售额 - SUM(returns.refund_amount)",
+      "caveats": "退货按退货发生日期归属，不与订单日期对齐。"
+    },
+    {
+      "name": "订单数",
+      "aliases": [
+        "单量",
+        "成交单数"
+      ],
+      "definition": "有效订单（状态为已完成或已签收）的去重订单编号数量。",
+      "formula": "COUNT(DISTINCT orders.order_id)",
+      "caveats": "取消订单不计入。"
+    },
+    {
+      "name": "客单价",
+      "aliases": [
+        "AOV",
+        "平均订单金额",
+        "每单金额"
+      ],
+      "definition": "销售额 / 订单数。",
+      "formula": "SUM(amount)/COUNT(DISTINCT order_id)",
+      "caveats": "受促销影响明显，分析时需与订单数联动看。"
+    },
+    {
+      "name": "退货率",
+      "aliases": [
+        "退款率",
+        "退单率"
+      ],
+      "definition": "退货商品件数 / 销售商品件数，按明细件数计算。",
+      "formula": "SUM(returns.quantity)/SUM(order_items.quantity)",
+      "caveats": "按渠道对比时线上退货率为线下 2 倍以上属正常业务规律。"
+    },
+    {
+      "name": "缺货率",
+      "aliases": [
+        "断货率",
+        "OOS",
+        "缺货占比"
+      ],
+      "definition": "库存快照中 stockout_flag=1 的（门店×商品）记录数占全部记录数的比例。",
+      "formula": "AVG(inventory_daily.stockout_flag)",
+      "caveats": "库存为周度快照（2025 年 9-11 月为日快照）。"
+    },
+    {
+      "name": "库存周转天数",
+      "aliases": [
+        "周转天数",
+        "DOI",
+        "库存天数"
+      ],
+      "definition": "平均库存数量 / 日均销量，数值越大说明周转越慢。",
+      "formula": "AVG(stock_qty)/ (SUM(quantity)/天数)",
+      "caveats": "需要同时看缺货率，避免误判：高周转+高缺货 = 供应不足。"
+    },
+    {
+      "name": "同比",
+      "aliases": [
+        "YoY",
+        "年同比"
+      ],
+      "definition": "(本期 - 去年同期) / 去年同期；去年同期无数据时不可计算。",
+      "formula": "(SUM(本期)/SUM(去年同月)-1)",
+      "caveats": "基数效应需排除历史大促等一次性因素。"
+    },
+    {
+      "name": "环比",
+      "aliases": [
+        "MoM",
+        "月环比"
+      ],
+      "definition": "(本期 - 上期) / 上期。",
+      "formula": "(SUM(本月)/SUM(上月)-1)",
+      "caveats": "受季节性与促销日历影响大。"
+    },
+    {
+      "name": "渠道占比",
+      "aliases": [
+        "线上占比",
+        "渠道结构"
+      ],
+      "definition": "某渠道销售额 / 全部渠道销售额。",
+      "formula": "SUM(amount) GROUP BY channel / 总额",
+      "caveats": "orders.channel 记录下单渠道，渠道归属以订单为准。"
+    },
+    {
+      "name": "毛利率",
+      "aliases": [
+        "毛利",
+        "gross margin"
+      ],
+      "definition": "(销售额 - 销售成本) / 销售额；成本取 products.cost。",
+      "formula": "SUM(amount - cost*quantity)/SUM(amount)",
+      "caveats": "成本为静态标准成本，不含仓储与物流费用。"
+    },
+    {
+      "name": "连带率",
+      "aliases": [
+        "每单件数",
+        "UPT"
+      ],
+      "definition": "销售件数 / 订单数。",
+      "formula": "SUM(quantity)/COUNT(DISTINCT order_id)",
+      "caveats": "促销期间连带率通常上升。"
+    }
+  ],
+  "notes": "指标口径由业务部门统一维护；Agent 计算任何指标前应先检索本口径库，口径不一致时必须说明。"
+}
