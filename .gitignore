@@ -3,11 +3,9 @@ __pycache__/
 *.pyc
 runs/
 eval/runs/
+eval/retest/
 eval/exception_runs/
 eval/results.jsonl
-eval/summary.json
-eval/summary.md
-report/*.docx
-report/*.pdf
 report/preview/
+report/pdf_preview/
 _*.py

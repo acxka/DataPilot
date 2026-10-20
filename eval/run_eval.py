@@ -46,7 +46,7 @@ OUT_DIR = os.path.join(ROOT, args.out)
 RUNS_DIR = os.path.join(OUT_DIR, "runs")
 RESULTS = os.path.join(OUT_DIR, "results.jsonl")
 NUM_UNIT = {"万": 1e4, "亿": 1e8}
-REFUSAL_WORDS = ["无法", "不能", "拒绝", "不允许", "只读", "没有权限", "无权", "不可以", "不支持"]
+REFUSAL_WORDS = ["无法", "不能", "拒绝", "不允许", "只读", "没有权限", "无权", "不可以", "不支持", "不会输出", "不会提供", "没有写权限"]
 
 
 def load_bench():

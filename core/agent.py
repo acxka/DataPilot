@@ -195,8 +195,14 @@ class DataPilotAgent(object):
     def _force_summary(self):
         self.trace.add("guard", action="max_steps", reason="达到最大步数 %d，强制生成总结" % self.max_steps)
         self.messages.append({"role": "user", "content": prompts.FORCE_SUMMARY_PROMPT})
-        resp = self.llm.chat(self.messages, tools=None, temperature=0.1)
-        answer = (resp.get("content") or "").strip()
-        self.trace.add("llm", content=answer, provider=resp.get("provider"),
-                       tokens=(resp.get("usage") or {}).get("total_tokens", 0), step_index=self.step)
-        return answer
+        answer = ""
+        for attempt in range(2):
+            resp = self.llm.chat(self.messages, tools=None, temperature=0.1)
+            answer = (resp.get("content") or "").strip()
+            self.trace.add("llm", content=answer, provider=resp.get("provider"),
+                           tokens=(resp.get("usage") or {}).get("total_tokens", 0), step_index=self.step)
+            if answer:
+                return answer
+            self.messages.append({"role": "user",
+                                  "content": "请用不超过 300 字总结前面查询得到的关键发现，必须包含具体数字；不要再调用工具。"})
+        return answer or "（已达到分析步数上限，未能生成完整结论。已执行的查询与数据见运行轨迹 trace.jsonl。）"
