@@ -61,94 +61,87 @@ def arrow(d, p0, p1, color=C_GRAY, width=3, label="", label_size=16):
 
 
 def architecture():
-    W, H = 1680, 1080
+    W, H = 1480, 980
     img = Image.new("RGB", (W, H), C_LIGHT)
     d = ImageDraw.Draw(img)
-    text(d, (60, 40), "DataPilot 系统架构", 40, True, C_NAVY)
-    text(d, (62, 96), "规划 — 执行 — 复核 三 Agent 协同 · 只读数据沙箱 · 全链路可审计", 20, False, C_GRAY)
+    text(d, (46, 26), "DataPilot 系统架构", 46, True, C_NAVY)
+    text(d, (48, 84), "规划 — 执行 — 复核 三 Agent 协同 · 只读数据沙箱 · 全链路可审计", 22, False, C_GRAY)
 
     # 用户层 / 接入层
-    rrect(d, (60, 170, 400, 270), fill=(239, 246, 255), outline=(147, 197, 253))
-    center(d, (60, 170, 400, 220), "业务用户", 22, True, C_BLUE)
-    center(d, (60, 220, 400, 270), "区域经理 / 运营 / 店长", 17, False, C_GRAY)
-    rrect(d, (470, 170, 810, 270), fill=(239, 246, 255), outline=(147, 197, 253))
-    center(d, (470, 170, 810, 220), "接入层 CLI / 飞书机器人", 22, True, C_BLUE)
-    center(d, (470, 220, 810, 270), "自然语言提问 · 多轮对话 · 澄清 · IM 长连接", 16, False, C_GRAY)
-    arrow(d, (400, 220), (470, 220), C_BLUE, 3, "提问")
+    rrect(d, (46, 130, 390, 236), fill=(239, 246, 255), outline=(147, 197, 253))
+    center(d, (46, 130, 390, 180), "业务用户", 26, True, C_BLUE)
+    center(d, (46, 180, 390, 236), "区域经理 / 运营 / 店长", 19, False, C_GRAY)
+    rrect(d, (460, 130, 820, 236), fill=(239, 246, 255), outline=(147, 197, 253))
+    center(d, (460, 130, 820, 180), "接入层 CLI / 飞书机器人", 26, True, C_BLUE)
+    center(d, (460, 180, 820, 236), "自然语言提问 · 多轮对话 · IM 长连接", 18, False, C_GRAY)
+    arrow(d, (390, 183), (460, 183), C_BLUE, 4, "提问")
 
     # Planner
-    rrect(d, (930, 150, 1440, 270), fill=(245, 243, 255), outline=(196, 181, 253))
-    center(d, (930, 150, 1440, 195), "Planner 规划 Agent", 23, True, C_PURPLE)
-    center(d, (930, 195, 1440, 270), "拆解子问题 · 指定指标与维度 · 识别信息缺口", 17, False, C_GRAY)
-    arrow(d, (810, 220), (930, 220), C_PURPLE, 3, "问题")
-    arrow(d, (1185, 270), (1185, 325), C_PURPLE, 3, "分析计划")
+    rrect(d, (920, 120, 1434, 246), fill=(245, 243, 255), outline=(196, 181, 253))
+    center(d, (920, 120, 1434, 170), "Planner 规划 Agent", 28, True, C_PURPLE)
+    center(d, (920, 170, 1434, 246), "拆解子问题 · 指定指标与维度 · 识别信息缺口", 19, False, C_GRAY)
+    arrow(d, (820, 183), (920, 183), C_PURPLE, 4, "问题")
+    arrow(d, (1177, 246), (1177, 300), C_PURPLE, 4, "分析计划")
 
-    # 信任边界 + Executor
-    text(d, (868, 318), "信任边界：Agent 只读访问，写操作在进入数据库前被拦截", 15, True, (220, 38, 38))
-    d.rectangle([(855, 345), (1660, 565)], outline=(220, 38, 38), width=3)
-    rrect(d, (930, 365, 1440, 535), fill=(240, 253, 244), outline=(134, 239, 172))
-    center(d, (930, 365, 1440, 411), "Executor 执行 Agent（ReAct）", 23, True, C_GREEN)
-    text(d, (955, 423), "Thought → Tool Call → Observation 循环", 17, False, C_GRAY)
-    rrect(d, (955, 452, 1415, 520), fill=C_WHITE, outline=(134, 239, 172))
-    center(d, (955, 452, 1415, 486), "7 个工具：表结构 / 只读SQL / 字段画像", 16, False, C_NAVY)
-    center(d, (955, 486, 1415, 520), "SVG 图表 / 指标口径检索 / 用户澄清", 16, False, C_NAVY)
-
-    # 数据层
-    rrect(d, (1470, 365, 1640, 535), fill=(254, 249, 195), outline=(253, 224, 71))
-    center(d, (1470, 365, 1640, 411), "数据层", 21, True, (161, 98, 7))
-    center(d, (1470, 415, 1640, 455), "SQLite 只读库", 16, False, C_GRAY)
-    center(d, (1470, 455, 1640, 493), "9 张表 / 44k 订单", 16, False, C_GRAY)
-    center(d, (1470, 493, 1640, 533), "指标口径库", 16, False, C_GRAY)
-    arrow(d, (1440, 450), (1470, 450), (161, 98, 7), 3)
+    # 信任边界 + Executor + 数据层
+    text(d, (840, 292), "信任边界：Agent 只读访问，写操作在进入数据库前被拦截", 17, True, (220, 38, 38))
+    d.rectangle([(826, 318), (1444, 566)], outline=(220, 38, 38), width=4)
+    rrect(d, (850, 336, 1190, 548), fill=(240, 253, 244), outline=(134, 239, 172))
+    center(d, (850, 336, 1190, 386), "Executor 执行 Agent（ReAct）", 21, True, C_GREEN)
+    center(d, (850, 392, 1190, 430), "Thought → Tool → Observation 循环", 18, False, C_GRAY)
+    rrect(d, (868, 440, 1172, 532), fill=C_WHITE, outline=(134, 239, 172))
+    center(d, (868, 440, 1172, 486), "7 个工具：表结构 / 只读SQL / 字段画像", 17, False, C_NAVY)
+    center(d, (868, 486, 1172, 532), "SVG 图表 / 口径检索 / 用户澄清", 17, False, C_NAVY)
+    rrect(d, (1210, 336, 1420, 548), fill=(254, 249, 195), outline=(253, 224, 71))
+    center(d, (1210, 336, 1420, 386), "数据层", 24, True, (161, 98, 7))
+    center(d, (1210, 390, 1420, 440), "SQLite 只读库", 18, False, C_GRAY)
+    center(d, (1210, 440, 1420, 490), "9 张表 / 44k 订单", 18, False, C_GRAY)
+    center(d, (1210, 490, 1420, 540), "指标口径库", 18, False, C_GRAY)
+    arrow(d, (1190, 430), (1210, 430), (161, 98, 7), 3)
 
     # 草稿 → Reviewer
-    arrow(d, (1185, 535), (1185, 640), C_GREEN, 3, "草稿结论 + 证据链")
-
-    # Reviewer
-    rrect(d, (930, 640, 1440, 800), fill=(255, 247, 237), outline=(253, 186, 116))
-    center(d, (930, 640, 1440, 688), "Reviewer 复核 Agent", 23, True, C_ORANGE)
-    text(d, (955, 705), "① 数字溯源校验：结论数字必须来自 SQL 结果或可推导", 17, False, C_GRAY)
-    text(d, (955, 740), "② 口径 / 因果 / 完整性审查 · 不通过则带意见回退补查", 17, False, C_GRAY)
+    arrow(d, (1177, 566), (1177, 640), C_GREEN, 4, "草稿 + 证据链")
+    rrect(d, (880, 640, 1434, 790), fill=(255, 247, 237), outline=(253, 186, 116))
+    center(d, (880, 640, 1434, 692), "Reviewer 复核 Agent", 28, True, C_ORANGE)
+    text(d, (902, 708), "① 数字溯源：结论数字必须来自 SQL 结果或可推导", 20, False, C_GRAY)
+    text(d, (902, 748), "② 口径 / 因果 / 完整性审查，不通过则回退补查（最多 2 轮）", 19, False, C_GRAY)
 
     # 回退补查
-    d.line([(930, 720), (890, 720)], fill=C_ORANGE, width=3)
-    d.line([(890, 720), (890, 450)], fill=C_ORANGE, width=3)
-    arrow(d, (890, 450), (930, 460), C_ORANGE, 3)
-    text(d, (640, 600), "复核不通过 → 回退补查（最多 2 轮）", 17, False, C_ORANGE)
+    d.line([(880, 720), (846, 720)], fill=C_ORANGE, width=4)
+    d.line([(846, 720), (846, 420)], fill=C_ORANGE, width=4)
+    arrow(d, (846, 420), (880, 430), C_ORANGE, 4)
+    text(d, (596, 664), "复核不通过 → 回退补查", 19, False, C_ORANGE)
 
     # 输出
-    arrow(d, (1185, 800), (1185, 875), C_NAVY, 3, "复核通过")
-    rrect(d, (860, 875, 1510, 1005), fill=(239, 246, 255), outline=(147, 197, 253))
-    center(d, (860, 875, 1510, 930), "结构化结论与交付物", 23, True, C_BLUE)
-    center(d, (860, 930, 1510, 968), "一句话结论 / 关键数据（注明来源） / 归因分析 / 行动建议", 17, False, C_GRAY)
-    center(d, (860, 968, 1510, 1005), "图表 SVG / Trace 轨迹 / 评测报告", 16, False, C_GRAY)
+    arrow(d, (1177, 790), (1177, 862), C_NAVY, 4, "复核通过")
+    rrect(d, (840, 862, 1434, 956), fill=(239, 246, 255), outline=(147, 197, 253))
+    center(d, (840, 862, 1434, 908), "结构化结论与交付物", 26, True, C_BLUE)
+    center(d, (840, 908, 1434, 956), "结论 / 数据（注明来源） / 归因 / 建议 / 图表 / Trace", 18, False, C_GRAY)
 
     # Trace
-    rrect(d, (60, 365, 400, 575), fill=(248, 250, 252), outline=C_BORDER)
-    center(d, (60, 365, 400, 415), "Trace 全链路留痕", 21, True, C_NAVY)
-    center(d, (60, 420, 400, 465), "trace.jsonl 逐步结构化日志", 16, False, C_GRAY)
-    center(d, (60, 465, 400, 505), "trace.html 可视化回放", 16, False, C_GRAY)
-    center(d, (60, 505, 400, 545), "护栏事件 / token / 耗时统计", 16, False, C_GRAY)
-    text(d, (70, 548), "每一步模型决策与工具返回都可回放", 14, False, C_GRAY)
+    rrect(d, (46, 336, 390, 566), fill=(248, 250, 252), outline=C_BORDER)
+    center(d, (46, 336, 390, 390), "Trace 全链路留痕", 26, True, C_NAVY)
+    center(d, (46, 400, 390, 444), "trace.jsonl 逐步结构化日志", 19, False, C_GRAY)
+    center(d, (46, 444, 390, 486), "trace.html 可视化回放", 19, False, C_GRAY)
+    center(d, (46, 486, 390, 528), "护栏事件 / token / 耗时统计", 19, False, C_GRAY)
+    text(d, (62, 534), "每一步模型决策与工具返回都可回放", 17, False, C_GRAY)
 
     # 模型路由
-    rrect(d, (60, 875, 780, 1005), fill=(248, 250, 252), outline=C_BORDER)
-    center(d, (60, 875, 780, 925), "模型路由与降级", 21, True, C_NAVY)
-    center(d, (60, 930, 780, 965), "主：DeepSeek v4-pro（执行）/ flash（规划·复核）", 15, False, C_GRAY)
-    center(d, (60, 965, 780, 1000), "备：OpenAI 兼容中转站，主接口故障自动切换", 15, False, C_GRAY)
+    rrect(d, (46, 862, 800, 956), fill=(248, 250, 252), outline=C_BORDER)
+    center(d, (46, 862, 800, 908), "模型路由与降级", 26, True, C_NAVY)
+    center(d, (46, 908, 800, 956), "主：DeepSeek v4-pro（执行）/ flash（规划·复核） · 备：中转站自动降级", 17, False, C_GRAY)
 
     path = os.path.join(ASSETS, "architecture.png")
     img.save(path)
     return path
 
-
-def grouped_bar(path, title, labels, series, ylabel="", width=1200, height=620, fmt=None):
+def grouped_bar(path, title, labels, series, ylabel="", width=1000, height=540, fmt=None):
     img = Image.new("RGB", (width, height), C_WHITE)
     d = ImageDraw.Draw(img)
-    text(d, (60, 34), title, 26, True, C_NAVY)
+    text(d, (46, 24), title, 32, True, C_NAVY)
     if ylabel:
-        text(d, (60, 76), ylabel, 15, False, C_GRAY)
-    ml, mr, mt, mb = 110, 40, 120, 110
+        text(d, (48, 68), ylabel, 19, False, C_GRAY)
+    ml, mr, mt, mb = 96, 30, 108, 96
     pw, ph = width - ml - mr, height - mt - mb
     vals = [v for s in series for v in s["values"]]
     vmax = max(vals) * 1.15 if max(vals) > 0 else 1
@@ -156,7 +149,7 @@ def grouped_bar(path, title, labels, series, ylabel="", width=1200, height=620, 
     for t in range(6):
         y = mt + ph - ph * t / 5
         d.line([(ml, y), (ml + pw, y)], fill=(226, 232, 240), width=1)
-        text(d, (ml - 12, y), fmt(t * vmax / 5) if fmt else "%g" % (t * vmax / 5), 14, False, C_GRAY, anchor="rm")
+        text(d, (ml - 10, y), fmt(t * vmax / 5) if fmt else "%g" % (t * vmax / 5), 17, False, C_GRAY, anchor="rm")
     n, k = len(labels), len(series)
     group_w = pw / n * 0.7
     bar_w = group_w / k
@@ -166,13 +159,13 @@ def grouped_bar(path, title, labels, series, ylabel="", width=1200, height=620, 
             x = ml + pw / n * i + (pw / n - group_w) / 2 + j * bar_w
             y = mt + ph - ph * max(v, 0) / vmax
             d.rounded_rectangle([x, y, x + bar_w - 6, mt + ph], radius=4, fill=colors[j % len(colors)])
-            text(d, (x + (bar_w - 6) / 2, y - 8), fmt(v) if fmt else "%g" % v, 13, False, C_NAVY, anchor="mb")
-        text(d, (ml + pw / n * (i + 0.5), mt + ph + 18), lab, 15, False, C_GRAY, anchor="ma")
+            text(d, (x + (bar_w - 6) / 2, y - 8), fmt(v) if fmt else "%g" % v, 16, False, C_NAVY, anchor="mb")
+        text(d, (ml + pw / n * (i + 0.5), mt + ph + 20), lab, 19, False, C_GRAY, anchor="ma")
     lx = ml
     for j, s in enumerate(series):
         d.rectangle([lx, height - 52, lx + 16, height - 36], fill=colors[j % len(colors)])
-        text(d, (lx + 24, height - 56), s["name"], 15, False, C_NAVY)
-        lx += 40 + d.textlength(s["name"], font=font(15))
+        text(d, (lx + 26, height - 58), s["name"], 18, False, C_NAVY)
+        lx += 44 + d.textlength(s["name"], font=font(18))
     img.save(path)
     return path
 
@@ -187,18 +180,18 @@ def chart_from_db(path, title, sql, fmt=None):
     return grouped_bar(path, title, labels, [s1, s2], "销售额（元）", fmt=fmt)
 
 
-def trace_timeline(path, trace_jsonl, width=1200, max_steps=26):
+def trace_timeline(path, trace_jsonl, width=1050, max_steps=26):
     recs = []
     with open(trace_jsonl, encoding="utf-8") as f:
         for line in f:
             recs.append(json.loads(line))
     recs = recs[:max_steps]
-    row_h = 46
+    row_h = 54
     height = 120 + row_h * len(recs) + 40
     img = Image.new("RGB", (width, height), C_WHITE)
     d = ImageDraw.Draw(img)
-    text(d, (60, 30), "运行轨迹 Trace（真实执行日志时间线）", 26, True, C_NAVY)
-    text(d, (60, 72), "每一行对应 trace.jsonl 中的一条记录：模型决策 / 工具调用 / 护栏事件", 15, False, C_GRAY)
+    text(d, (40, 22), "运行轨迹 Trace（真实执行日志时间线）", 32, True, C_NAVY)
+    text(d, (42, 66), "每一行对应 trace.jsonl 中的一条记录：模型决策 / 工具调用 / 护栏事件", 18, False, C_GRAY)
     colors = {"user": C_BLUE, "llm": C_PURPLE, "tool": C_GREEN, "guard": (220, 38, 38),
               "system": (8, 145, 178), "final": C_NAVY}
     labels = {"user": "用户", "llm": "模型", "tool": "工具", "guard": "护栏",
@@ -207,13 +200,13 @@ def trace_timeline(path, trace_jsonl, width=1200, max_steps=26):
     for i, r in enumerate(recs):
         kind = r.get("kind", "")
         color = colors.get(kind, C_GRAY)
-        d.line([(150, y), (150, y + row_h)], fill=(226, 232, 240), width=2)
-        d.ellipse([(142, y + 12), (158, y + 28)], fill=color)
-        text(d, (60, y + 12), "步骤%02d" % r.get("step", i + 1), 14, False, C_GRAY)
+        d.line([(130, y), (130, y + row_h)], fill=(226, 232, 240), width=3)
+        d.ellipse([(120, y + 14), (140, y + 34)], fill=color)
+        text(d, (40, y + 14), "步骤%02d" % r.get("step", i + 1), 17, False, C_GRAY)
         tag = labels.get(kind, kind)
-        tw = d.textlength(tag, font=font(14))
-        d.rounded_rectangle([178, y + 8, 178 + tw + 22, y + 32], radius=10, fill=color)
-        text(d, (178 + 11, y + 20), tag, 14, True, C_WHITE, anchor="lm")
+        tw = d.textlength(tag, font=font(17))
+        d.rounded_rectangle([168, y + 8, 168 + tw + 26, y + 40], radius=12, fill=color)
+        text(d, (168 + 13, y + 24), tag, 17, True, C_WHITE, anchor="lm")
         desc = ""
         if kind == "tool":
             desc = "%s(%s)" % (r.get("name"), _short(r.get("args"), 70))
@@ -228,7 +221,7 @@ def trace_timeline(path, trace_jsonl, width=1200, max_steps=26):
             desc = r.get("text") or ""
         else:
             desc = (r.get("text") or "")[:80].replace("\n", " ")
-        text(d, (320, y + 16), _short(desc, 78), 15, False, (51, 65, 85))
+        text(d, (356, y + 18), _short(desc, 62), 19, False, (51, 65, 85))
         y += row_h
     img.save(path)
     return path
