@@ -34,6 +34,9 @@ python main.py --check
 # 4. 开始分析
 python main.py "2025年10月华东区销售额比去年同期下滑了多少？主要原因是什么？"
 
+# 5. 接入真实 IM（飞书机器人，需配置 FEISHU_APP_ID/SECRET）
+python integrations/feishu_bot.py
+
 # 多智能体模式（默认）/ 单 Agent 对照模式
 python main.py --mode team   "问题"
 python main.py --mode single "问题"
@@ -112,6 +115,7 @@ datapilot/
 ├── data/
 │   ├── build_db.py         # 示例数据集生成器（可复现）
 │   └── metric_dict.json    # 指标口径库
+├── integrations/           # 真实 IM 对接：飞书机器人（长连接 + Protobuf 标准库实现）
 ├── eval/
 │   ├── benchmark.jsonl     # 40 题评测集（含标准 SQL / 期望行为）
 │   ├── run_eval.py         # 自动评测
@@ -125,6 +129,7 @@ datapilot/
 - **上下文压缩**：多轮工具调用会重复发送历史，Agent 会将较早的工具结果摘要化，控制 token 增长。
 - **成本**：一次复杂分析约 8~17 万 tokens；规划/复核使用快模型（deepseek-flash）分担成本。
 - **局限**：只读单库分析，不含跨库联邦查询；图表类型有限；对“举办过但未挂单”类业务事实无法从数据推断。
+- **真实前端**：已接入飞书自建应用（事件订阅长连接），群聊 @机器人 即可提问并收到完整分析；长连接客户端为纯标准库实现。
 
 ## 8. 许可
 

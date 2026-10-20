@@ -266,8 +266,8 @@ def build():
     # 页面与默认样式
     sec = doc.sections[0]
     sec.page_width, sec.page_height = Cm(21.0), Cm(29.7)
-    sec.top_margin = sec.bottom_margin = Cm(2.3)
-    sec.left_margin = sec.right_margin = Cm(2.4)
+    sec.top_margin = sec.bottom_margin = Cm(1.9)
+    sec.left_margin = sec.right_margin = Cm(2.2)
     style = doc.styles["Normal"]
     style.font.name = BODY_FONT
     style.font.size = Pt(10.5)
@@ -326,6 +326,8 @@ def build():
                 % (9, "{:,}".format(stats["order_items"]),
                    summary["questions"] if summary else 40, exc["total"] if exc else 16))
     para(doc, abstract)
+    para(doc, "在真实生产对接方面，系统通过飞书自建应用的事件订阅长连接接入 IM：用户在多人群聊中 @机器人 提问，"
+              "机器人 1 秒内给出“正在分析”反馈，35 秒后返回完整的四段式分析结论，验证了 Agent 在真实协作场景中的可用性。")
     p = doc.add_paragraph()
     p.paragraph_format.space_before = Pt(10)
     r = p.add_run("关键词：")
@@ -397,13 +399,16 @@ def build():
     heading(doc, "2.1 整体架构与工作流", 2)
     para(doc, "系统采用「三 Agent + 双护栏 + 全链路留痕」的分层架构。三个 Agent 各司其职、"
               "通过结构化消息协作，避免让同一个模型同时承担「拆解、取数、审查」三种相互冲突的职责。")
-    picture(doc, os.path.join(ASSETS, "architecture.png"), 12.8, "图 2-1  DataPilot 系统架构")
+    picture(doc, os.path.join(ASSETS, "architecture.png"), 11.2, "图 2-1  DataPilot 系统架构")
     para(doc, "工作流可以概括为五个阶段：")
     bullet(doc, "① 规划：Planner 读取数据库结构与业务问题，输出 JSON 形式的分析计划（子问题、指标、维度、信息缺口）；")
     bullet(doc, "② 执行：Executor 按计划进入 ReAct 循环，每一轮自主决定调用哪个工具，直至收集到足够证据；")
     bullet(doc, "③ 自检：Executor 用两条独立 SQL 交叉验证关键数字（如分店加总是否等于总量）；")
     bullet(doc, "④ 复核：Reviewer 结合程序化数字溯源校验审查草稿，不通过则带具体意见回退补查，最多 2 轮；")
     bullet(doc, "⑤ 交付：输出结构化结论、图表与完整轨迹；全过程写入 trace.jsonl 并生成 HTML 回放。")
+    para(doc, "接入层提供两种入口：本地 CLI（开发、评测、复现用）与飞书机器人（真实 IM 场景）。飞书侧采用"
+              "「自建应用 + 事件订阅-长连接」模式：收到 im.message.receive_v1 事件后 3 秒内 ACK，再由工作线程调用本 Agent，"
+              "完成后在群聊/私聊中回复结论，无需公网 IP 与内网穿透。")
 
     heading(doc, "2.2 核心模型选型", 2)
     table(doc, ["角色", "模型", "选型依据", "实测表现"], [
@@ -474,11 +479,10 @@ def build():
            FROM orders o JOIN order_items oi ON oi.order_id=o.order_id ...
    -> [["2024-10", 1193736.20, 539], ["2025-10", 1002474.24, 361]]
 [Step 06] run_sql: ... GROUP BY p.category   -> 大家电 -132,138.99（占下滑额 69%）
-[Step 08] run_sql: ... promotions / promo_id -> 2024-10 有「华东金秋家电节」，539 单全部挂促销；2025-10 无促销
-[Step 10] make_chart: 华东区门店销售额同比（grouped_bar）
+[Step 08] run_sql: promotions/promo_id -> 2024-10 有「华东金秋家电节」539 单全挂促销；2025-10 无促销
 [Step 12] 输出四段式结论（16.02% 下滑 / 促销断档为主因 / 已排除降价与退货）""")
         para(doc, "最终结论节选：")
-        excerpt(doc, res.get("answer", "")[:1100] if res.get("answer") else "")
+        excerpt(doc, res.get("answer", "")[:700] if res.get("answer") else "")
         picture(doc, os.path.join(ASSETS, "chart_category.png"), 11.6,
                 "图 3-2  华东区 10 月各品类销售额同比（Agent 自主调用 make_chart 生成的数据图）")
     else:
@@ -540,7 +544,26 @@ def build():
     ], widths=[4.0, 5.5, 5.5])
     timeline = os.path.join(ASSETS, "trace_timeline.png")
     if os.path.exists(timeline):
-        picture(doc, timeline, 12.8, "图 3-1  一次真实运行的 Trace 时间线（由 trace.jsonl 自动生成，可逐条核对）")
+        picture(doc, timeline, 9.8, "图 3-1  一次真实运行的 Trace 时间线（由 trace.jsonl 自动生成，可逐条核对）")
+
+    heading(doc, "3.4 真实生产对接：飞书机器人", 2)
+    para(doc, "为验证「真实可用的人机交互链路」，本项目把 Agent 接入了飞书：在飞书开放平台创建企业自建应用、"
+              "开启机器人能力与事件订阅长连接，客户端用标准库手写 WebSocket（RFC 6455）与 Protobuf（pbbp2.Frame）"
+              "完成长连接通信，收到消息事件后调用 Agent 分析并回复。下图是在飞书群内 @机器人 的真实对话：")
+    picture(doc, os.path.join(ASSETS, "feishu_demo.png"), 11.0,
+            "图 3-4  飞书群内 @机器人 的真实对话（提问 → 即时反馈 → 完整分析结论）")
+    table(doc, ["接入指标", "实测值"], [
+        ["接入方式", "飞书企业自建应用 + 事件订阅-长连接（WebSocket）"],
+        ["触发方式", "群聊 @机器人 / 单聊消息（im.message.receive_v1）"],
+        ["事件响应", "收到事件后立即 ACK 并回复“正在分析”，< 1 秒"],
+        ["端到端时延", "从提问到完整结论 34.7 秒（本次案例）"],
+        ["单次分析开销", "36,458 tokens（6 步决策、8 条 SQL）"],
+        ["协议实现", "标准库手写 WebSocket + Protobuf，零第三方依赖"],
+    ], widths=[3.6, 11.6], size=8.5)
+    para(doc, "工程要点：① 长连接客户端不依赖官方 SDK（沙箱内无法稳定安装），自行实现握手、掩码帧、心跳与重连；"
+              "② 事件必须在 3 秒内 ACK，否则会被重推，因此 ACK 与「分析」解耦到两个线程；"
+              "③ 按 message_id 去重、过滤机器人自身消息，避免自问自答死循环；④ 长连接只收到事件、发消息走 OpenAPI，"
+              "两条链路分别做错误兜底。")
 
     # ================= 四、异常处理 =================
     heading(doc, "四、异常处理与边界测试", 1)
@@ -603,6 +626,17 @@ def build():
     bullet(doc, "解决：在 Prompt 的澄清约束中明确「未给时间范围必须先问」，并区分「必须追问」与「允许假设」两种情形；"
                 "复测 5/5 全部触发澄清，整体通过率由 90% 提升至 100%。")
 
+    para(doc, "问题 7：飞书长连接「连得上但收不到任何事件」。")
+    bullet(doc, "现象：应用配置（机器人、长连接、im.message.receive_v1、权限、发布）全部正确，WebSocket 也能连上，"
+                "但服务端从不回 pong、也从不推送消息事件；换成官方 SDK 文档中的帧结构对比后发现差异。")
+    bullet(doc, "排查：逐字节对比官方 protobuf 序列化结果，发现飞书的 pbbp2.Frame 是 proto2 语义——"
+                "SeqID/LogID/method 即使为 0 也必须显式编码（官方字节含 08 00 10 00 20 00），"
+                "而我们按 proto3 习惯省略了零值字段，服务端解析失败、连接从未真正注册。")
+    bullet(doc, "解决：改为显式编码零值字段后，与官方 SDK 输出逐字节一致（0800100018f681801020002a0c...），"
+                "连接立即收到 pong 并开始正常投递事件；随后群聊 @机器人 实测成功（图 3-4）。")
+    bullet(doc, "另一个坑：最初的个人租户（豆包账号）被飞书平台收回了自建应用 OpenAPI 调用权限（21001），"
+                "换到企业租户后解决——说明「平台/租户策略」也是落地时必须验证的边界。")
+
     heading(doc, "5.2 生产环境落地的局限性分析", 2)
     bullet(doc, "时延与成本：复杂归因单次 60~300 秒、9~17 万 tokens，按当前模型价目量级估算单次约 0.2~0.5 元；"
                 "高频查询场景需要缓存、预聚合与更激进的上下文压缩。")
@@ -624,6 +658,7 @@ def build():
         ["eval/benchmark.jsonl", "40 题评测集（基础聚合/多表关联/同比环比/归因/模糊缺参/越权注入）"],
         ["eval/run_eval.py", "自动评测脚本：数值命中率、通过率、token/耗时统计"],
         ["eval/run_exception.py", "异常与护栏测试：16 组用例"],
+        ["integrations/", "飞书机器人：WebSocket/Protobuf 长连接客户端、OpenAPI 封装、消息处理"],
         ["report/", "报告生成脚本、架构图、运行截图与本文档"],
         [".env.example", "环境变量样例（密钥不提交）"],
     ], widths=[4.4, 11.4], size=8.5)
@@ -636,7 +671,8 @@ python main.py --check           # 自检：数据库 + 模型接口
 python main.py "2025年10月华东区销售额同比下滑多少？主要原因是什么？"
 python main.py --mode single "问题"      # 单 Agent 对照模式
 python eval/run_eval.py --mode single --workers 4 --max-steps 9   # 40 题评测
-python eval/run_exception.py                                        # 异常与护栏测试""")
+python eval/run_exception.py                                        # 异常与护栏测试
+python integrations/feishu_bot.py                                   # 启动飞书机器人（需 FEISHU_APP_ID/SECRET）""")
 
     heading(doc, "6.3 评测结果摘要", 2)
     before = load_json(os.path.join(ROOT, "eval", "summary_before.json"))

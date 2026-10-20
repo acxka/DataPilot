@@ -72,8 +72,8 @@ def architecture():
     center(d, (60, 170, 400, 220), "业务用户", 22, True, C_BLUE)
     center(d, (60, 220, 400, 270), "区域经理 / 运营 / 店长", 17, False, C_GRAY)
     rrect(d, (470, 170, 810, 270), fill=(239, 246, 255), outline=(147, 197, 253))
-    center(d, (470, 170, 810, 220), "接入层 CLI / Web", 22, True, C_BLUE)
-    center(d, (470, 220, 810, 270), "自然语言提问 · 多轮对话 · 澄清", 17, False, C_GRAY)
+    center(d, (470, 170, 810, 220), "接入层 CLI / 飞书机器人", 22, True, C_BLUE)
+    center(d, (470, 220, 810, 270), "自然语言提问 · 多轮对话 · 澄清 · IM 长连接", 16, False, C_GRAY)
     arrow(d, (400, 220), (470, 220), C_BLUE, 3, "提问")
 
     # Planner

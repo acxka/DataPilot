@@ -7,5 +7,6 @@ eval/retest/
 eval/exception_runs/
 eval/results.jsonl
 report/preview/
-report/pdf_preview/
+report/pdf_check/
 _*.py
+*.whl
