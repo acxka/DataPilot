@@ -300,7 +300,7 @@ def build():
     info = [("姓　　名", "曹舟彦"), ("学　　号", "202330304911"),
             ("专业班级", "电气工程及其自动化七班"), ("项目名称", "DataPilot 企业运营数据分析智能体"),
             ("提交日期", "2026 年 10 月 23 日"),
-            ("代码仓库", "完整源码随作业提交（本地 Git 仓库）")]
+            ("代码仓库", "https://github.com/acxka/DataPilot")]
     for k, v in info:
         p = doc.add_paragraph()
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
